@@ -1,8 +1,15 @@
 const gameContainer = document.getElementById("game");
 
-let cardOne = null
+let cardOne = null;
 
-let cardTwo = null
+let cardTwo = null;
+
+let noClicking = false;
+
+let currentScore = 0;
+
+
+
 
 //keeping track of hhow
 let cardsFlipped = 0;
@@ -64,16 +71,39 @@ function createDivsForColors(colorArray) {
   }
 }
 
+
+
+
+
+
 // TODO: Implement this function!
 function handleCardClick(event) {
+  console.log(noClicking);
+  console.log(cardsFlipped)
+  if (noClicking) return;
+  if (event.target.classList.contains("flipped")){
+    return;
+  }
   //variable assigns what color is clicked on
    let currentCard = event.target;
   
   //add boolean if card is clicked on
   currentCard.style.backgroundColor = currentCard.classList[0];
+
+  if (!cardOne || !cardTwo ) {
+
+    if (!currentCard.classList.add('flipped')){
+      setScore(currentScore + 1)
+    }
+    cardOne = cardOne || currentCard;
+    cardTwo = currentCard === cardOne ? null : currentCard;
+    
+  }
   //console.log(currentCard.classList[0])
   //cards stay flipped if matched
   if (cardOne && cardTwo) {
+    //console.log(cardOne.className);
+    noClicking = true;
     let gif1 = cardOne.className;
     let gif2 = cardTwo.className;
     if (gif1 === gif2) {
@@ -81,28 +111,88 @@ function handleCardClick(event) {
       cardTwo.removeEventListener('click', handleCardClick);
       cardOne = null;
       cardTwo = null;
+      noClicking = false
+      cardsFlipped += 2
     } else { //switching card back after two seconds if cards do not match
       setTimeout(function () {
+        cardOne.classList.remove("flipped");
+        cardTwo.classList.remove("flipped");
+        console.log(cardOne);
         cardOne.style.backgroundColor = "";
         cardTwo.style.backgroundColor = ""; 
         cardOne = null;
         cardTwo = null;
-      }, 2000);
+        noClicking = false;
+      }, 1000);
     }
   }
-  
-  if (!cardOne || !cardTwo ) {
-    currentCard.classList.add('flipped');
-    cardOne = cardOne || currentCard
-    cardTwo = currentCard === cardOne ? null : currentCard;
-    
+  //restart button appears when all colors are matched
+  if (cardsFlipped === COLORS.length && cardsFlipped > 0) {
+    //getting #restart from html
+    let restart = document.getElementById('restart');
+    //creating button
+    let restartButton = document.createElement('button');
+    //what the same of the botton the user will see
+    restartButton.innerText = "Restart";
+    //clears previous content
+    restart.innerHTML = ''
+    alert('Game Over your score is ' + currentScore)
+    //connected HTML ID element to new button
+    restart = restart.appendChild(restartButton)
+    //completed button that restarts the game
+    restart.addEventListener('click', function(event) {
+      //this is how game reloads
+      location.reload(true)
+    })
   }
-
   // you can use event.target to see which element was clicked
   console.log("you just clicked", event.target);
 }
 
+function setScore(newScore) {
+  currentScore = newScore;
+  document.getElementById("current-score").innerText = currentScore;
+
+}
+
+//Start of Menu code
+
+//getting menu div node from html
+const menuScreen = document.getElementById("menu-screen");
+
+// getting start button div node from html
+const start = document.getElementById("start");
+
+const startButton = document.createElement('button');
+
+//defining start button
+
+startButton.innerText = 'Start Game';
+
+//adding function to button
+
+startButton.addEventListener('click', startGame)
+
+//getting game screen div node from html
+
+const gameScreen = document.getElementById("game-screen")
+
+// Adding button to menu
+
+start.appendChild(startButton)
+
+function startGame() {
+  menuScreen.style.display = 'none';
+  gameScreen.style.display = "block";
+  initializeGame()
+}
 
 
-// when the DOM loads
-createDivsForColors(shuffledColors);
+//end of menu code
+
+
+
+function initializeGame() {
+  //when DOM loads
+  createDivsForColors(shuffle(COLORS))
+}
