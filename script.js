@@ -8,8 +8,64 @@ let noClicking = false;
 
 let currentScore = 0;
 
+//saved game in local storage when one refreshes
+
+const savedScore = JSON.parse(localStorage.getItem('currentScore'));
+
+const savedTimeElapsed = JSON.parse(localStorage.getItem('timeElapsed'))
+
+const savedFlippedCards = JSON.parse(localStorage.getItem('flippedCards'))
+
+//game will continue if there is time and score
+
+if ((savedScore !== null) && (savedElapsedTime !== null) && (savedFlippedCards !== null)) {
+  currentScore = savedScore;
+  timeElapsed = savedTimeElapsed;
+  cardsFlipped = savedFlippedCards;
+
+  displayTimer()
+  setScore(currentScore)
+}
+
+//restoring flippedCards
+
+const savedFlippedCardsElements = document.querySelectorAll('.flipped');
+
+for (let card of savedFlippedCardsElements) {
+  card.style.backgroundColor = card.classList[0]
+}
+
+menuScreen.style.display = 'none';
+gameScreen.style.display = 'block';
+
+if (cardsFlipped === COLORS.length) {
+  startTimer();
+}
+
+//saving game to local storage
+
+function saveGameState() {
+  updateLocalStorage('currentScore', currentScore)
+  updateLocalStorage('timeElapsed', timeElapsed)
+  updateLocalStorage('flippedCards', cardsFlipped)
+}
+
+//calling save game state when there is a change in game state
+
+function handleCardClick(event) {
+  // Your existing code here
+
+  // Call saveGameState after handling card click
+  saveGameState();
+}
 
 
+
+// function to update local storage
+
+function updateLocalStorage(item, val) {
+  localStorage.setItem(item, JSON.stringify(val));
+}
 
 //keeping track of hhow
 let cardsFlipped = 0;
@@ -141,9 +197,18 @@ function handleCardClick(event) {
     restart = restart.appendChild(restartButton)
     //completed button that restarts the game
     restart.addEventListener('click', function(event) {
-      //this is how game reloads
-      location.reload(true)
+      //this is how game restarts
+      currentScore = 0;
+      timeElapsed = 0;
+      cardsFlipped = 0;
+      setScore(currentScore);
+      displayTimer();
+      stopTimer();
+      localStorage.clear(); // clearing saved game state
+      initializeGame()
     })
+    // Stop the timer when the game ends
+    stopTimer();
   }
   // you can use event.target to see which element was clicked
   console.log("you just clicked", event.target);
@@ -152,8 +217,38 @@ function handleCardClick(event) {
 function setScore(newScore) {
   currentScore = newScore;
   document.getElementById("current-score").innerText = currentScore;
-
+  // Update local storage with the new score
+  updateLocalStorage('currentScore', currentScore);
 }
+
+
+// Start of Timer Code
+
+let timeInterval
+
+let timeElapsed = 0
+
+function startTimer () {
+  timeInterval = setInterval(function() {
+    timeElapsed += 1
+    displayTimer()
+  }, 1000)
+}
+
+function displayTimer() {
+  const minutes = Math.floor(timeElapsed/60)
+  const seconds = timeElapsed % 60
+  const timeDislay = `${ minutes.toString().padStart(2, '0')
+  }:${ seconds.toString().padStart(2, '0') }`
+  document.getElementById('timer').innerText = timeDislay
+}
+
+function stopTimer () {
+  clearInterval(timeInterval)
+}
+
+//end timer code
+
 
 //Start of Menu code
 
@@ -185,7 +280,9 @@ function startGame() {
   menuScreen.style.display = 'none';
   gameScreen.style.display = "block";
   initializeGame()
+  startTimer()
 }
+
 
 
 //end of menu code
