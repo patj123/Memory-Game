@@ -5,3 +5,36 @@
   margin: 10px;
   display: inline-block;
 }
+
+.card {
+  width: 100px;
+  height: 100px;
+  background-color: gray;
+  /* Default color */
+  border: 1px solid black;
+  margin: 5px;
+}
+
+.card.flipped {
+  background-color: var(--card-color);
+}
+
+.red {
+  --card-color: red;
+}
+
+.blue {
+  --card-color: blue;
+}
+
+.green {
+  --card-color: green;
+}
+
+.orange {
+  --card-color: orange;
+}
+
+.purple {
+  --card-color: purple;
+}

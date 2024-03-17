@@ -1,295 +1,194 @@
-const gameContainer = document.getElementById("game");
+document.addEventListener("DOMContentLoaded", function () {
+  // Global variables
+  const gameContainer = document.getElementById("game");
+  let cardOne = null;
+  let cardTwo = null;
+  let noClicking = false;
+  let currentScore = 0;
+  let timeElapsed = 0;
+  let cardsFlipped = 0;
 
-let cardOne = null;
+  // Array of colors for the game
+  const COLORS = [
+    "red", "blue", "green", "orange", "purple",
+    "red", "blue", "green", "orange", "purple"
+  ];
 
-let cardTwo = null;
-
-let noClicking = false;
-
-let currentScore = 0;
-
-//saved game in local storage when one refreshes
-
-const savedScore = JSON.parse(localStorage.getItem('currentScore'));
-
-const savedTimeElapsed = JSON.parse(localStorage.getItem('timeElapsed'))
-
-const savedFlippedCards = JSON.parse(localStorage.getItem('flippedCards'))
-
-//game will continue if there is time and score
-
-if ((savedScore !== null) && (savedElapsedTime !== null) && (savedFlippedCards !== null)) {
-  currentScore = savedScore;
-  timeElapsed = savedTimeElapsed;
-  cardsFlipped = savedFlippedCards;
-
-  displayTimer()
-  setScore(currentScore)
-}
-
-//restoring flippedCards
-
-const savedFlippedCardsElements = document.querySelectorAll('.flipped');
-
-for (let card of savedFlippedCardsElements) {
-  card.style.backgroundColor = card.classList[0]
-}
-
-menuScreen.style.display = 'none';
-gameScreen.style.display = 'block';
-
-if (cardsFlipped === COLORS.length) {
-  startTimer();
-}
-
-//saving game to local storage
-
-function saveGameState() {
-  updateLocalStorage('currentScore', currentScore)
-  updateLocalStorage('timeElapsed', timeElapsed)
-  updateLocalStorage('flippedCards', cardsFlipped)
-}
-
-//calling save game state when there is a change in game state
-
-function handleCardClick(event) {
-  // Your existing code here
-
-  // Call saveGameState after handling card click
-  saveGameState();
-}
-
-
-
-// function to update local storage
-
-function updateLocalStorage(item, val) {
-  localStorage.setItem(item, JSON.stringify(val));
-}
-
-//keeping track of hhow
-let cardsFlipped = 0;
-
-const COLORS = [
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple",
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple"
-];
-
-// here is a helper function to shuffle an array
-// it returns the same array with values shuffled
-// it is based on an algorithm called Fisher Yates if you want ot research more
-function shuffle(array) {
-  let counter = array.length;
-
-  // While there are elements in the array
-  while (counter > 0) {
-    // Pick a random index
-    let index = Math.floor(Math.random() * counter);
-
-    // Decrease counter by 1
-    counter--;
-
-    // And swap the last element with it
-    let temp = array[counter];
-    array[counter] = array[index];
-    array[index] = temp;
+  // Function to create the "Start Game" button
+  function createStartButton() {
+    const start = document.getElementById("start");
+    const startButton = document.createElement('button');
+    startButton.innerText = 'Start Game';
+    startButton.addEventListener('click', startGame);
+    start.appendChild(startButton);
   }
 
-  return array;
-}
+  // Create the "Start Game" button
+  createStartButton();
 
-let shuffledColors = shuffle(COLORS);
+  // Function to create divs for colors
+  function createDivsForColors(colorArray) {
+    console.log("Creating divs for colors:", colorArray);
+    for (let color of colorArray) {
+      // create a new div
+      const newDiv = document.createElement("div");
 
-// this function loops over the array of colors
-// it creates a new div and gives it a class with the value of the color
-// it also adds an event listener for a click for each card
-function createDivsForColors(colorArray) {
-  for (let color of colorArray) {
-    // create a new div
-    const newDiv = document.createElement("div");
+      // give it a class attribute for the value we are looping over
+      newDiv.classList.add("card", color);
 
-    // give it a class attribute for the value we are looping over
-    newDiv.classList.add(color);
+      // call a function handleCardClick when a div is clicked on
+      newDiv.addEventListener("click", handleCardClick);
 
-    // call a function handleCardClick when a div is clicked on
-    newDiv.addEventListener("click", handleCardClick);
+      // append the div to the element with an id of game
+      gameContainer.append(newDiv);
 
-    // append the div to the element with an id of game
-    gameContainer.append(newDiv);
-  }
-}
-
-
-
-
-
-
-// TODO: Implement this function!
-function handleCardClick(event) {
-  console.log(noClicking);
-  console.log(cardsFlipped)
-  if (noClicking) return;
-  if (event.target.classList.contains("flipped")){
-    return;
-  }
-  //variable assigns what color is clicked on
-   let currentCard = event.target;
-  
-  //add boolean if card is clicked on
-  currentCard.style.backgroundColor = currentCard.classList[0];
-
-  if (!cardOne || !cardTwo ) {
-
-    if (!currentCard.classList.add('flipped')){
-      setScore(currentScore + 1)
+      console.log("Added div with color:", color);
     }
-    cardOne = cardOne || currentCard;
-    cardTwo = currentCard === cardOne ? null : currentCard;
-    
   }
-  //console.log(currentCard.classList[0])
-  //cards stay flipped if matched
-  if (cardOne && cardTwo) {
-    //console.log(cardOne.className);
-    noClicking = true;
-    let gif1 = cardOne.className;
-    let gif2 = cardTwo.className;
-    if (gif1 === gif2) {
-      cardOne.removeEventListener('click', handleCardClick);
-      cardTwo.removeEventListener('click', handleCardClick);
-      cardOne = null;
+
+  // Function to shuffle array
+  function shuffle(array) {
+    let counter = array.length;
+    while (counter > 0) {
+      let index = Math.floor(Math.random() * counter);
+      counter--;
+      let temp = array[counter];
+      array[counter] = array[index];
+      array[index] = temp;
+    }
+    return array;
+  }
+
+  // Function to handle card click
+  function handleCardClick(event) {
+    console.log("Clicked on card");
+
+    // Check if clicking is disabled
+    if (noClicking) {
+      console.log("Clicking is disabled");
+      return;
+    }
+
+    const clickedCard = event.target;
+    console.log("Clicked card:", clickedCard);
+
+    // Check if the clicked card is already flipped or is the same card
+    if (clickedCard.classList.contains('flipped') || clickedCard === cardOne) {
+      console.log("Card already flipped or same card");
+      return;
+    }
+
+    // Add flipped class to show the color
+    console.log("Flipping card");
+    clickedCard.classList.add('flipped');
+
+    // Check if cardOne is null (first card) or already set (second card)
+    if (!cardOne || cardTwo) {
+      console.log("Setting cardOne:", clickedCard);
+      cardOne = clickedCard;
       cardTwo = null;
-      noClicking = false
-      cardsFlipped += 2
-    } else { //switching card back after two seconds if cards do not match
-      setTimeout(function () {
-        cardOne.classList.remove("flipped");
-        cardTwo.classList.remove("flipped");
-        console.log(cardOne);
-        cardOne.style.backgroundColor = "";
-        cardTwo.style.backgroundColor = ""; 
+      return;
+    }
+
+    // If second card is flipped, check for match
+    if (cardOne && !cardTwo) {
+      console.log("Second card clicked:", clickedCard);
+      cardTwo = clickedCard;
+
+      // Check for match
+      if (cardOne.className === cardTwo.className) {
+        console.log("Match found!");
+        // If cards match, remove event listener and update score
+        cardOne.removeEventListener('click', handleCardClick);
+        cardTwo.removeEventListener('click', handleCardClick);
         cardOne = null;
         cardTwo = null;
-        noClicking = false;
-      }, 1000);
+        setScore(currentScore + 1); // Increment score
+
+        // Increment cardsFlipped and stop the timer when all cards are matched
+        cardsFlipped += 2;
+        if (cardsFlipped === COLORS.length) {
+          stopTimer();
+          // Implement any additional logic here when all cards are matched
+        }
+      } else {
+        console.log("No match, flipping back...");
+        // If cards don't match, disable clicking temporarily and flip cards back
+        noClicking = true;
+        setTimeout(() => {
+          cardOne.classList.remove('flipped');
+          cardTwo.classList.remove('flipped');
+          cardOne = null;
+          cardTwo = null;
+          noClicking = false;
+        }, 1000);
+      }
     }
   }
-  //restart button appears when all colors are matched
-  if (cardsFlipped === COLORS.length && cardsFlipped > 0) {
-    //getting #restart from html
-    let restart = document.getElementById('restart');
-    //creating button
-    let restartButton = document.createElement('button');
-    //what the same of the botton the user will see
-    restartButton.innerText = "Restart";
-    //clears previous content
-    restart.innerHTML = ''
-    alert('Game Over your score is ' + currentScore)
-    //connected HTML ID element to new button
-    restart = restart.appendChild(restartButton)
-    //completed button that restarts the game
-    restart.addEventListener('click', function(event) {
-      //this is how game restarts
-      currentScore = 0;
-      timeElapsed = 0;
-      cardsFlipped = 0;
-      setScore(currentScore);
-      displayTimer();
-      stopTimer();
-      localStorage.clear(); // clearing saved game state
-      initializeGame()
-    })
-    // Stop the timer when the game ends
-    stopTimer();
+
+  // Start game function
+  function startGame() {
+    // Hide menu screen and show game screen
+    const menuScreen = document.getElementById("menu-screen");
+    const gameScreen = document.getElementById("game-screen");
+    menuScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+
+    // Initialize game
+    currentScore = 0;
+    timeElapsed = 0;
+    cardsFlipped = 0;
+    setScore(currentScore);
+    displayTimer();
+    initializeGame();
+    startTimer();
   }
-  // you can use event.target to see which element was clicked
-  console.log("you just clicked", event.target);
-}
 
-function setScore(newScore) {
-  currentScore = newScore;
-  document.getElementById("current-score").innerText = currentScore;
-  // Update local storage with the new score
-  updateLocalStorage('currentScore', currentScore);
-}
+  // Function to set score
+  function setScore(newScore) {
+    currentScore = newScore;
+    document.getElementById("current-score").innerText = currentScore;
+  }
 
+  // Timer functions
+  let timeInterval;
 
-// Start of Timer Code
+  function startTimer() {
+    timeInterval = setInterval(function () {
+      timeElapsed += 1;
+      displayTimer();
+    }, 1000);
+  }
 
-let timeInterval
+  function displayTimer() {
+    const minutes = Math.floor(timeElapsed / 60);
+    const seconds = timeElapsed % 60;
+    const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('timer').innerText = timeDisplay;
+  }
 
-let timeElapsed = 0
+  function stopTimer() {
+    clearInterval(timeInterval);
+  }
 
-function startTimer () {
-  timeInterval = setInterval(function() {
-    timeElapsed += 1
-    displayTimer()
-  }, 1000)
-}
+  // Restart button event listener
+  const restartButton = document.getElementById('restart');
+  restartButton.addEventListener('click', function (event) {
+    // Restart game logic
+    currentScore = 0;
+    timeElapsed = 0;
+    cardsFlipped = 0;
+    setScore(currentScore);
+    displayTimer();
+    stopTimer();
+    localStorage.clear(); // Clear saved game state
+    initializeGame(); // Restart game
+  });
 
-function displayTimer() {
-  const minutes = Math.floor(timeElapsed/60)
-  const seconds = timeElapsed % 60
-  const timeDislay = `${ minutes.toString().padStart(2, '0')
-  }:${ seconds.toString().padStart(2, '0') }`
-  document.getElementById('timer').innerText = timeDislay
-}
-
-function stopTimer () {
-  clearInterval(timeInterval)
-}
-
-//end timer code
-
-
-//Start of Menu code
-
-//getting menu div node from html
-const menuScreen = document.getElementById("menu-screen");
-
-// getting start button div node from html
-const start = document.getElementById("start");
-
-const startButton = document.createElement('button');
-
-//defining start button
-
-startButton.innerText = 'Start Game';
-
-//adding function to button
-
-startButton.addEventListener('click', startGame)
-
-//getting game screen div node from html
-
-const gameScreen = document.getElementById("game-screen")
-
-// Adding button to menu
-
-start.appendChild(startButton)
-
-function startGame() {
-  menuScreen.style.display = 'none';
-  gameScreen.style.display = "block";
-  initializeGame()
-  startTimer()
-}
-
-
-
-//end of menu code
-
-
-
-function initializeGame() {
-  //when DOM loads
-  createDivsForColors(shuffle(COLORS))
-}
+  // Function to initialize game
+  function initializeGame() {
+    gameContainer.innerHTML = ''; // Clear existing cards
+    const shuffledColors = shuffle(COLORS);
+    createDivsForColors(shuffledColors);
+  }
+});
