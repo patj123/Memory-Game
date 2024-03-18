@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentScore = 0;
   let timeElapsed = 0;
   let cardsFlipped = 0;
+  let gameComplete = false; // Flag to track if the game is complete
 
   // Array of colors for the game
   const COLORS = [
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       console.log("Added div with color:", color);
     }
+
   }
 
   // Function to shuffle array
@@ -69,8 +71,18 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    if (event.target.classList.contains("flipped")) return;
+
     const clickedCard = event.target;
     console.log("Clicked card:", clickedCard);
+
+    // Check if cardOne is null (first card) or already set (second card)
+    if (!cardOne || cardTwo) {
+      console.log("Setting cardOne:", clickedCard);
+      cardOne = clickedCard;
+      cardTwo = null;
+      return;
+    }
 
     // Check if the clicked card is already flipped or is the same card
     if (clickedCard.classList.contains('flipped') || clickedCard === cardOne) {
@@ -82,35 +94,27 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Flipping card");
     clickedCard.classList.add('flipped');
 
-    // Check if cardOne is null (first card) or already set (second card)
-    if (!cardOne || cardTwo) {
-      console.log("Setting cardOne:", clickedCard);
-      cardOne = clickedCard;
-      cardTwo = null;
-      return;
-    }
+    // Increment current score
+    currentScore++;
+
+    
 
     // If second card is flipped, check for match
-    if (cardOne && !cardTwo) {
+    if (cardOne && cardTwo) {
       console.log("Second card clicked:", clickedCard);
       cardTwo = clickedCard;
-
+console.log("cardOne.className" , cardOne.className);
+console.log("cardTwo.className", cardTwo.className);
       // Check for match
       if (cardOne.className === cardTwo.className) {
         console.log("Match found!");
-        // If cards match, remove event listener and update score
+        //cardsFlipped += 2;
+        currentScore++;
+        // If cards match, remove event listener and reset card variables
         cardOne.removeEventListener('click', handleCardClick);
         cardTwo.removeEventListener('click', handleCardClick);
         cardOne = null;
         cardTwo = null;
-        setScore(currentScore + 1); // Increment score
-
-        // Increment cardsFlipped and stop the timer when all cards are matched
-        cardsFlipped += 2;
-        if (cardsFlipped === COLORS.length) {
-          stopTimer();
-          // Implement any additional logic here when all cards are matched
-        }
       } else {
         console.log("No match, flipping back...");
         // If cards don't match, disable clicking temporarily and flip cards back
@@ -126,6 +130,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // Function to display the restart button
+  function displayRestartButton() {
+    const restartButton = document.getElementById('restart');
+    restartButton.style.display = 'block';
+  }
+
   // Start game function
   function startGame() {
     // Hide menu screen and show game screen
@@ -138,6 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
     currentScore = 0;
     timeElapsed = 0;
     cardsFlipped = 0;
+    gameComplete = false; // Reset game complete flag
     setScore(currentScore);
     displayTimer();
     initializeGame();
@@ -178,10 +189,10 @@ document.addEventListener("DOMContentLoaded", function () {
     currentScore = 0;
     timeElapsed = 0;
     cardsFlipped = 0;
+    gameComplete = false; // Reset game complete flag
     setScore(currentScore);
     displayTimer();
-    stopTimer();
-    localStorage.clear(); // Clear saved game state
+    restartButton.style.display = 'none'; // Hide restart button
     initializeGame(); // Restart game
   });
 
@@ -190,5 +201,6 @@ document.addEventListener("DOMContentLoaded", function () {
     gameContainer.innerHTML = ''; // Clear existing cards
     const shuffledColors = shuffle(COLORS);
     createDivsForColors(shuffledColors);
+    startTimer(); // Start the timer when initializing the game
   }
 });
