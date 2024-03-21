@@ -15,8 +15,8 @@ restartButton.innerText = "Restart";
 
 // Define an array of colors for the cards
 const COLORS = [
-  "red", "blue", "green", "orange", "purple",
-  "red", "blue", "green", "orange", "purple"
+  "red", "blue", "green", "orange", "purple", "yellow",
+  "red", "blue", "green", "orange", "purple", "yellow"
 ];
 
 // Shuffle the array of colors
@@ -57,44 +57,50 @@ function handleCardClick(event) {
   if (noClicking || event.target.classList.contains("flipped")) return;
 
   let currentCard = event.target;
-  currentCard.style.backgroundColor = currentCard.classList[0];
-  if (!cardOne || !cardTwo) {
-    if (!currentCard.classList.add('flipped')) {
-      setScore(currentScore + 1);
-    }
-    cardOne = cardOne || currentCard;
-    cardTwo = currentCard === cardOne ? null : currentCard;
-  }
 
-  if (cardOne && cardTwo) {
-    noClicking = true;
-    let gif1 = cardOne.className;
-    let gif2 = cardTwo.className;
-    if (gif1 === gif2) {
-      cardOne.removeEventListener('click', handleCardClick);
-      cardTwo.removeEventListener('click', handleCardClick);
-      cardOne = null;
-      cardTwo = null;
-      noClicking = false;
-      cardsFlipped += 2;
-    } else {
-      setTimeout(function () {
-        cardOne.classList.remove("flipped");
-        cardTwo.classList.remove("flipped");
-        cardOne.style.backgroundColor = "";
-        cardTwo.style.backgroundColor = "";
+  // Flip animation
+  currentCard.classList.add('flipped');
+
+  // Delay to let the flip animation play
+  setTimeout(() => {
+    currentCard.style.backgroundColor = currentCard.classList[0];
+
+    if (!cardOne || !cardTwo) {
+      setScore(currentScore + 1);
+      cardOne = cardOne || currentCard;
+      cardTwo = currentCard === cardOne ? null : currentCard;
+    }
+
+    if (cardOne && cardTwo) {
+      noClicking = true;
+      let gif1 = cardOne.className;
+      let gif2 = cardTwo.className;
+      if (gif1 === gif2) {
+        cardOne.removeEventListener('click', handleCardClick);
+        cardTwo.removeEventListener('click', handleCardClick);
         cardOne = null;
         cardTwo = null;
         noClicking = false;
-      }, 1000);
+        cardsFlipped += 2;
+      } else {
+        setTimeout(function () {
+          cardOne.classList.remove("flipped");
+          cardTwo.classList.remove("flipped");
+          cardOne.style.backgroundColor = "";
+          cardTwo.style.backgroundColor = "";
+          cardOne = null;
+          cardTwo = null;
+          noClicking = false;
+        }, 1000);
+      }
     }
-  }
 
-  if (cardsFlipped === COLORS.length && cardsFlipped > 0) {
-    restart.innerHTML = '';
-    lowestScore();
-    restart = restart.appendChild(restartButton);
-  }
+    if (cardsFlipped === COLORS.length && cardsFlipped > 0) {
+      restart.innerHTML = '';
+      lowestScore();
+      restart = restart.appendChild(restartButton);
+    }
+  }, 200); // Adjust this value as needed to match your CSS animation duration
 }
 
 // Function to restart the game
