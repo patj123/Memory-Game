@@ -9,40 +9,27 @@
 
 <body>
 
-  <head>
-    <meta charset="UTF-8" />
-    <title>Memory Game!</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
+  <!-- Menu Screen -->
+  <div id="menu-screen">
+    <h1>Welcome To Memory Game!</h1>
+    <div id="start"></div>
+    <div id="lowest-score"></div>
+  </div>
 
-  <body>
-    <!--Menu Screen-->
-    <div id="menu-screen">
-      <h1>Welcome To Memory Game!</h1>
-      <div id="start"></div>
-      
-    </div>
-    <br>
-    <div id="lowest-score">
+  <!-- Game Screen -->
+  <div id="game-screen" style="display: none;">
+    <h1>Memory Game!</h1>
+    <div id="game"></div>
+    <div id="current-score"><span class="score-label">Current Score:</span></div>
+  </div>
 
-    </div>
-    <br>
-    <!--The game itself-->
-    <div id="game-screen" style="display: none;">
-      <h1>Memory Game!</h1>
-      <div id="game">
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" style="display: none;">
+    <h1 id="game-over-message"></h1>
+    <div id="restart"></div> <!-- This is where the restart button will be appended -->
+  </div>
 
-
-
-      </div>
-    </div>
-    <div id="current-score">
-
-    </div>
-    <div id="restart">
-
-    </div>
-  </body>
   <script src="script.js"></script>
+</body>
 
 </html>

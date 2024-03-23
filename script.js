@@ -8,11 +8,6 @@ let noClicking = false;
 let currentScore = 0;
 let cardsFlipped = 0;
 
-// Get the restart button element and create a restart button
-let restart = document.getElementById('restart');
-let restartButton = document.createElement('button');
-restartButton.innerText = "Restart";
-
 // Define an array of colors for the cards
 const COLORS = [
   "red", "blue", "green", "orange", "purple", "yellow",
@@ -96,21 +91,58 @@ function handleCardClick(event) {
     }
 
     if (cardsFlipped === COLORS.length && cardsFlipped > 0) {
-      restart.innerHTML = '';
-      lowestScore();
-      restart = restart.appendChild(restartButton);
+      handleGameOver();
     }
   }, 200); // Adjust this value as needed to match your CSS animation duration
 }
 
+// Function to handle game over
+function handleGameOver() {
+  let gameOverScreen = document.getElementById("game-over-screen");
+  let gameOverMessage = document.getElementById("game-over-message");
+  let restartButton = document.createElement('button');
+  restartButton.innerText = "Restart";
+  restartButton.addEventListener('click', restartGame);
+
+  if (lowestScore !== null) {
+    if (currentScore < lowestScore) {
+      gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}. You are the lowest scorer.`;
+    } else if (currentScore === lowestScore) {
+      gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}. You tied the lowest score.`;
+    } else {
+      gameOverMessage.innerText = `Game over, your score is ${currentScore}. That is ${currentScore - localStorage.getItem('lowestScore')} points higher than the lowest score. Better luck next time.`;
+    }
+  } else {
+    gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}.`;
+  }
+
+  if (currentScore === COLORS.length) {
+    gameOverMessage.innerText = "YOU ARE A CHAMPION!!!!!!!";
+  }
+
+  gameOverScreen.style.display = "block";
+  gameOverScreen.appendChild(restartButton);
+
+  // Center Restart button
+  restartButton.style.position = "absolute";
+  restartButton.style.top = "50%";
+  restartButton.style.left = "50%";
+  restartButton.style.transform = "translate(-50%, -50%)";
+
+  // Hide game screen
+  document.getElementById("game-screen").style.display = "none";
+}
+
 // Function to restart the game
-restart.addEventListener('click', function (event) {
+function restartGame() {
   setScore(0);
   cardsFlipped = 0;
-  removeDivsForColors();
-  initializeGame();
+  removeDivsForColors(); // Remove existing cards
+  initializeGame(); // Initialize the game again
   displayLowestScore();
-});
+  let gameOverScreen = document.getElementById("game-over-screen");
+  gameOverScreen.style.display = "none"; // Hide game over screen
+}
 
 // Function to set the current score
 function setScore(newScore) {
@@ -129,37 +161,33 @@ function lowestScore() {
 
 // Function to display the lowest score
 function displayLowestScore() {
-  let lowestScore = localStorage.getItem('lowestScore');
-  document.getElementById("lowest-score").innerText = lowestScore;
+  let lowestScoreValue = localStorage.getItem('lowestScore');
+  let lowestScoreContainer = document.getElementById("lowest-score");
+  if (lowestScoreValue !== null) {
+    lowestScoreContainer.innerText = `Lowest Score: ${lowestScoreValue}`;
+  } else {
+    lowestScoreContainer.innerText = "";
+  }
 }
 
 // Function to initialize the game
 function initializeGame() {
-  createDivsForColors(shuffle(COLORS));
+  createDivsForColors(shuffledColors);
+
 }
 
-// Start of Menu code
-
-// Get menu screen and start button elements
-const menuScreen = document.getElementById("menu-screen");
-const start = document.getElementById("start");
-
-// Create a start button
-const startButton = document.createElement('button');
+// Start Button Click Event
+let startButton = document.createElement('button');
 startButton.innerText = 'Start Game';
 startButton.addEventListener('click', startGame);
-
-// Get game screen element
-const gameScreen = document.getElementById("game-screen");
-
-// Add start button to the menu
-start.appendChild(startButton);
+document.getElementById('start').appendChild(startButton);
 
 // Function to start the game
 function startGame() {
+  let menuScreen = document.getElementById("menu-screen");
+  let gameScreen = document.getElementById("game-screen");
   menuScreen.style.display = 'none';
   gameScreen.style.display = "block";
   displayLowestScore();
   initializeGame();
 }
-// End of Menu code

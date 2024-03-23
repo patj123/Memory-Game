@@ -62,7 +62,10 @@ body {
   width: 100px;
   height: 150px;
   margin: 10px;
-  background-color: white;
+  background-image: url('card_back.jpg');
+    /* Set the background image */
+    background-size: cover;
+    /* Cover the entire div with the background image */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,6 +76,41 @@ body {
 
 #game div.flipped {
   transform: rotateY(180deg);
+  background-image: none;
+}
+
+#current-score {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.score-label {
+  font-weight: bold;
+  /* Adjust font weight as needed */
+}
+
+/* Style the container around the lowest score */
+#lowest-score-container {
+  background-color: silver;
+  border-radius: 20px;
+  /* Adjust the border radius as needed */
+  padding: 10px;
+  /* Adjust the padding as needed */
+  margin-top: 20px;
+  /* Adjust the margin as needed */
+}
+
+/* Style the lowest score */
+#lowest-score {
+  text-align: center;
+}
+
+/* Style the lowest score value */
+#lowest-score-value {
+  font-size: 18px;
+  /* Adjust the font size as needed */
+  font-weight: bold;
+  /* Adjust the font weight as needed */
 }
 
 /* Scores styles */
@@ -81,4 +119,23 @@ body {
 #restart {
   text-align: center;
   margin-top: 20px;
+}
+
+/* Restart button styles */
+#restart {
+  margin-top: 50px;
+  /* Adjust the top margin as needed */
+}
+
+#restart button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+#restart button:hover {
+  background-color: #0056b3;
 }
