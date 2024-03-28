@@ -63,9 +63,9 @@ body {
   height: 150px;
   margin: 10px;
   background-image: url('card_back.jpg');
-    /* Set the background image */
-    background-size: cover;
-    /* Cover the entire div with the background image */
+  /* Set the background image */
+  background-size: cover;
+  /* Cover the entire div with the background image */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -138,4 +138,24 @@ body {
 
 #restart button:hover {
   background-color: #0056b3;
+}
+
+/* Game Over Screen styles */
+#game-over-screen {
+  text-align: center;
+  /* Center the text horizontally */
+}
+
+#game-over-message {
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin: 50px auto;
+  /* Center the box horizontally */
+  border-left: 10px solid silver;
+  border-right: 10px solid silver;
+  font-size: 16px;
+  max-width: 10%;
+  /* Set maximum width */
 }

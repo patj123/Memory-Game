@@ -13,7 +13,7 @@
   <div id="menu-screen">
     <h1>Welcome To Memory Game!</h1>
     <div id="start"></div>
-    <div id="lowest-score"></div>
+    <div id="lowest-score">Lowest Score: <span id="lowest-score-value"></span></div> <!-- Display lowest score here -->
   </div>
 
   <!-- Game Screen -->
@@ -25,8 +25,11 @@
 
   <!-- Game Over Screen -->
   <div id="game-over-screen" style="display: none;">
-    <h1 id="game-over-message"></h1>
-    <div id="restart"></div> <!-- This is where the restart button will be appended -->
+    <div id="game-over-message-container">
+      <h1 id="game-over-message"></h1>
+      <div id="restart"></div> <!-- This is where the restart button will be appended -->
+    </div>
+    
   </div>
 
   <script src="script.js"></script>

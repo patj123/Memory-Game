@@ -104,13 +104,17 @@ function handleGameOver() {
   restartButton.innerText = "Restart";
   restartButton.addEventListener('click', restartGame);
 
-  if (lowestScore !== null) {
-    if (currentScore < lowestScore) {
+  // Update or set the lowest score in localStorage
+  lowestScore();
+
+  let storedLowestScore = localStorage.getItem('lowestScore');
+  if (storedLowestScore !== null) {
+    if (currentScore < parseInt(storedLowestScore)) {
       gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}. You are the lowest scorer.`;
-    } else if (currentScore === lowestScore) {
+    } else if (currentScore === parseInt(storedLowestScore)) {
       gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}. You tied the lowest score.`;
     } else {
-      gameOverMessage.innerText = `Game over, your score is ${currentScore}. That is ${currentScore - localStorage.getItem('lowestScore')} points higher than the lowest score. Better luck next time.`;
+      gameOverMessage.innerText = `Game over, your score is ${currentScore}. That is ${currentScore - parseInt(storedLowestScore)} points higher than the lowest score. Better luck next time.`;
     }
   } else {
     gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}.`;
@@ -120,8 +124,13 @@ function handleGameOver() {
     gameOverMessage.innerText = "YOU ARE A CHAMPION!!!!!!!";
   }
 
-  gameOverScreen.style.display = "block";
+  // Clear previous content of game-over-screen
+  gameOverScreen.innerHTML = '';
+
+  // Append game over message and restart button to the game-over-screen
+  gameOverScreen.appendChild(gameOverMessage);
   gameOverScreen.appendChild(restartButton);
+  gameOverScreen.style.display = "block";
 
   // Center Restart button
   restartButton.style.position = "absolute";
@@ -138,10 +147,12 @@ function restartGame() {
   setScore(0);
   cardsFlipped = 0;
   removeDivsForColors(); // Remove existing cards
+  shuffledColors = shuffle(COLORS); // Shuffle the colors again
   initializeGame(); // Initialize the game again
   displayLowestScore();
   let gameOverScreen = document.getElementById("game-over-screen");
   gameOverScreen.style.display = "none"; // Hide game over screen
+  document.getElementById("game-screen").style.display = "block";
 }
 
 // Function to set the current score
@@ -152,9 +163,9 @@ function setScore(newScore) {
 
 // Function to update or set the lowest score in localStorage
 function lowestScore() {
-  if (localStorage.getItem('lowestScore') === null) {
-    localStorage.setItem('lowestScore', currentScore);
-  } else if (currentScore < localStorage.getItem('lowestScore')) {
+  let storedLowestScore = localStorage.getItem('lowestScore');
+
+  if (storedLowestScore === null || currentScore < parseInt(storedLowestScore)) {
     localStorage.setItem('lowestScore', currentScore);
   }
 }
@@ -173,7 +184,6 @@ function displayLowestScore() {
 // Function to initialize the game
 function initializeGame() {
   createDivsForColors(shuffledColors);
-
 }
 
 // Start Button Click Event
