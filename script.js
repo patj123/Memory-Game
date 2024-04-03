@@ -105,10 +105,11 @@ function handleGameOver() {
   restartButton.addEventListener('click', restartGame);
 
   // Update or set the lowest score in localStorage
-  lowestScore();
+  
 
   let storedLowestScore = localStorage.getItem('lowestScore');
   if (storedLowestScore !== null) {
+    lowestScore();
     if (currentScore < parseInt(storedLowestScore)) {
       gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}. You are the lowest scorer.`;
     } else if (currentScore === parseInt(storedLowestScore)) {
@@ -118,6 +119,7 @@ function handleGameOver() {
     }
   } else {
     gameOverMessage.innerText = `Congratulations! Your score is ${currentScore}.`;
+    lowestScore();
   }
 
   if (currentScore === COLORS.length) {
@@ -153,12 +155,18 @@ function restartGame() {
   let gameOverScreen = document.getElementById("game-over-screen");
   gameOverScreen.style.display = "none"; // Hide game over screen
   document.getElementById("game-screen").style.display = "block";
+
+  // Set the style of the restart button to match the start button
+  const restartButton = document.querySelector('#restart button');
+  restartButton.classList = "start";
 }
 
 // Function to set the current score
 function setScore(newScore) {
   currentScore = newScore;
-  document.getElementById("current-score").innerText = currentScore;
+  const scoreElement = document.getElementById("current-score");
+  scoreElement.innerText = `Current Score: ${currentScore}`;
+  scoreElement.classList.add("score-label");
 }
 
 // Function to update or set the lowest score in localStorage
@@ -177,7 +185,7 @@ function displayLowestScore() {
   if (lowestScoreValue !== null) {
     lowestScoreContainer.innerText = `Lowest Score: ${lowestScoreValue}`;
   } else {
-    lowestScoreContainer.innerText = "";
+    lowestScoreContainer.innerText = "N/A";
   }
 }
 
